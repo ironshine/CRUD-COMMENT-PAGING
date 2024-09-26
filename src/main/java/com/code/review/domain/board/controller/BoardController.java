@@ -4,6 +4,7 @@ import com.code.review.domain.board.dto.BoardRequestDto;
 import com.code.review.domain.board.dto.BoardResponseDto;
 import com.code.review.domain.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +24,12 @@ public class BoardController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BoardResponseDto>> getBoards() {
-        return ResponseEntity.ok(boardService.getBoards());
+    public ResponseEntity<Page<BoardResponseDto>> getBoards(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
+            @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc) {
+        return ResponseEntity.ok(boardService.getBoards(page - 1, size, sortBy, isAsc));
     }
 
     @GetMapping("/{boardId}")

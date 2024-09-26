@@ -5,6 +5,10 @@ import com.code.review.domain.board.dto.BoardResponseDto;
 import com.code.review.domain.board.entity.Board;
 import com.code.review.domain.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,22 +27,16 @@ public class BoardService {
         return BoardResponseDto.of(board);
     }
 
-    public List<BoardResponseDto> getBoards() {
-        List<Board> boardList = boardRepository.findAll();
-//        List<BoardResponseDto> dtoList = new ArrayList<>();
-//        for (Board board : boardList) {                        // .stream()
-//            BoardResponseDto dto = BoardResponseDto.of(board); // .map()
-//            dtoList.add(dto                                    // .toList()
-//        }
-        return boardList.stream()
-                .map(BoardResponseDto::of)
-                .toList();
-        /**
-         * .map(board -> BoardResponseDto.of(board)) 와 동일합니다
-         * List<Board> -> List<BoardResponseDto> 로 변경해줍니다.
-         * List<Board>의 board를 순차적으로 가져와 BoardResponseDto.of(board)로 dto를 생성합니다.
-         * 생성된 dto는 아래의 .toList()에 의해 List<BoardResponseDto>에 담깁니다.
-         */
+    @Transactional(readOnly = true)
+    public Page<BoardResponseDto> getBoards(int page, int size, String sortBy, boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Board> boardList = boardRepository.findAll(pageable);
+
+        return boardList.map(BoardResponseDto::of);
     }
 
     public BoardResponseDto getBoard(Long boardId) {
