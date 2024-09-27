@@ -1,9 +1,13 @@
 package com.code.review.domain.board.entity;
 
 import com.code.review.domain.board.dto.BoardRequestDto;
+import com.code.review.domain.comment.entity.Comment;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,8 +21,8 @@ public class Board {
     private String title;
     @Column(name = "content")
     private String content;
-//    @OneToMany(mappedBy = "comment")
-//    private List<Comment> commentList;
+    @OneToMany(mappedBy = "board")
+    private List<Comment> commentList = new ArrayList<>();
 
     /**
      * 정적 팩토리 메서드 사용
